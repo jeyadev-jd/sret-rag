@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRET-RAG SERVER</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" id="newChatBtn">New chat</button>
+            </div>
+            <div class="chat-list" id="chatList"></div>
+            <div class="sidebar-footer">
+                <button class="settings-btn" id="themeBtn" title="Theme">Theme</button>
+                <div class="user-info" id="userInfo"></div>
+                <button class="logout-btn" id="logoutBtn">Sign out</button>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <select class="model-selector" id="modelSelector"></select>
+                </div>
+                <div class="top-bar-right">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="searchToggle" checked>
+                        Web search
+                    </label>
+                </div>
+            </div>
+
+            <div class="messages-container">
+                <div class="messages-area" id="messagesArea"></div>
+            </div>
+
+            <button class="scroll-bottom-btn hidden" id="scrollBottomBtn" title="Scroll to bottom" aria-label="Scroll to bottom"></button>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea class="input-textarea" id="inputMessage" placeholder="Message..."></textarea>
+                    <div class="input-actions">
+                        <button class="action-btn upload-btn" id="uploadBtn" title="Upload PDF">Upload</button>
+                        <button class="action-btn send-btn" id="sendBtn" title="Send">Send</button>
+                        <button class="action-btn stop-btn hidden" id="stopBtn" title="Stop">Stop</button>
+                    </div>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none;" accept=".pdf,.txt,.html,.md">
+
+    <div class="context-menu hidden" id="chatMenu">
+        <button data-action="rename" class="menu-item">Rename</button>
+        <button data-action="delete" class="menu-item delete">Delete</button>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

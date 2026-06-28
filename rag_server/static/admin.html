@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - SRET-RAG SERVER</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Söhne, ui-sans-serif, system-ui, -apple-system, sans-serif;
+            background: #343541;
+            color: #ececf1;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        h1 { font-size: 28px; }
+        .back-btn {
+            padding: 8px 16px;
+            background: #565869;
+            border: 1px solid #565869;
+            color: #ececf1;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .add-user-form {
+            background: #565869;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #565869;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        input, select {
+            padding: 8px;
+            background: #343541;
+            border: 1px solid #565869;
+            color: #ececf1;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .add-btn {
+            padding: 8px 16px;
+            background: #10a37f;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .add-btn:hover { background: #0a8e6f; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #565869;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid #565869;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #565869;
+            font-size: 13px;
+        }
+        tr:hover { background: rgba(255, 255, 255, 0.05); }
+        .edit-btn, .deactivate-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        .edit-btn { background: #10a37f; color: white; }
+        .deactivate-btn { background: #d32f2f; color: white; }
+        .error { color: #d32f2f; margin-top: 12px; font-size: 13px; }
+        .success { color: #10a37f; margin-top: 12px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <h1>Admin Panel</h1>
+            <button class="back-btn" id="backBtn">← Back</button>
+        </div>
+
+        <div class="add-user-form">
+            <h2 style="margin-bottom: 12px;">Add New User</h2>
+            <div class="form-row">
+                <input type="text" id="newUsername" placeholder="Username">
+                <input type="password" id="newPassword" placeholder="Password">
+                <select id="newRole">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button class="add-btn" id="addUserBtn">Add User</button>
+            </div>
+            <div id="message"></div>
+        </div>
+
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
+
+        async function api(method, path, body = null) {
+            const opts = { method, headers: { 'Authorization': 'Bearer ' + token } };
+            if (body) {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(path, opts);
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('token');
+                window.location.href = '/index.html';
+            }
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+
+        async function loadUsers() {
+            try {
+                const users = await api('GET', '/admin/users');
+                const tbody = document.getElementById('usersBody');
+                tbody.innerHTML = '';
+                for (const u of users) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${u.username}</td>
+                        <td>${u.role}</td>
+                        <td>${u.is_active ? 'Active' : 'Deactivated'}</td>
+                        <td>${u.created_at.slice(0, 10)}</td>
+                        <td>
+                            <button class="deactivate-btn" onclick="deactivateUser(${u.id})">Deactivate</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            } catch (e) {
+                alert('Failed to load users: ' + e.message);
+            }
+        }
+
+        async function deactivateUser(id) {
+            if (!confirm('Deactivate this user?')) return;
+            try {
+                await api('DELETE', `/admin/users/${id}`);
+                loadUsers();
+            } catch (e) {
+                alert('Failed: ' + e.message);
+            }
+        }
+
+        document.getElementById('addUserBtn').addEventListener('click', async () => {
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            const msg = document.getElementById('message');
+
+            msg.textContent = '';
+            if (!username || !password) {
+                msg.textContent = 'Username and password required';
+                msg.className = 'error';
+                return;
+            }
+
+            try {
+                await api('POST', '/admin/users', { username, password, role });
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+                msg.textContent = 'User created!';
+                msg.className = 'success';
+                loadUsers();
+            } catch (e) {
+                msg.textContent = 'Failed: ' + e.message;
+                msg.className = 'error';
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = '/app.html';
+        });
+
+        loadUsers();
+    </script>
+</body>
+</html>

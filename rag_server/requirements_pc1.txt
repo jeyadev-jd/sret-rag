@@ -1,0 +1,9 @@
+fastapi==0.135.1
+uvicorn==0.41.0
+httpx==0.28.1
+aiosqlite==0.21.0
+pydantic==2.12.5
+pydantic-settings==2.14.1
+python-multipart==0.0.22
+bcrypt==5.0.0
+aiofiles==25.1.0

@@ -1,0 +1,25 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# large binary/offline bundles
+wheels/
+debs/
+models/
+llama.cpp/build/
+llama.cpp/models/
+
+# runtime storage
+storage/faiss.index
+storage/metadata.db
+storage/uploads/
+
+# secrets
+.cloudflared/
+*.json.bak
+
+# misc
+*.log
+.DS_Store
