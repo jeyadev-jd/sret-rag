@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "sret-rag: Self-Hosted RAG on a 4-PC LAN Cluster"
+abstract: "Built for offline AI access at college with zero cloud dependency. Fully offline, self-hosted Retrieval-Augmented Generation system distributed across 4 budget PCs on a LAN: a FastAPI gateway, dedicated embedder, FAISS vector index, and a llama.cpp/Qwen2.5 LLM node. ChatGPT-style UI, cited answers, embed caching, doc dedup, and session-based auth."
+authors:
+  - family-names: "R"
+    given-names: "Jeyadev"
+    email: "jeyadev2006@gmail.com"
+    affiliation: "Sri Ramachandra Institute of Higher Education and Research"
+repository-code: "https://github.com/jeyadev-jd/sret-rag"
+url: "https://jeyadev.dev/projects/sret-rag"
+keywords:
+  - "FastAPI"
+  - "FAISS"
+  - "llama.cpp"
+  - "Qwen2.5"
+  - "SQLite"
+  - "sentence-transformers"
+date-released: "2026-10-10"
